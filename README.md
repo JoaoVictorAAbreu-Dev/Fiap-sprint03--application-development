@@ -134,7 +134,9 @@ Para continuidade do projeto, recomenda-se:
 
 ## 14. Video Pitch
 
-- Link do video pitch (1 minuto): `https://SEU-LINK-AQUI`
+Vídeo de apresentação da Sprint 2:
+
+[Assistir ao vídeo pitch](https://youtu.be/o3p0zVOPK0o)
 
 ## 15. Evidencias visuais (prints)
 
@@ -165,7 +167,7 @@ Para manter consistencia da apresentacao de sensoriamento:
 
 - Projeto zipado com codigo-fonte.
 - Arquivo `integrantes.txt` no pacote final.
-- Link do video pitch no README.
+- Link do video pitch no README: [https://youtu.be/o3p0zVOPK0o](https://youtu.be/o3p0zVOPK0o).
 - (Opcional) Link do repositorio GitHub, se aceito pelo professor.
 
 ## 18. Aderencia aos criterios de avaliacao
