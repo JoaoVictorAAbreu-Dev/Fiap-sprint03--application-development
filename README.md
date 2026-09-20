@@ -242,7 +242,7 @@ npm audit
 
 No estado atual da Sprint 3:
 
-- **18 testes unitários aprovados** em 5 arquivos;
+- **21 testes unitários aprovados** em 6 arquivos;
 - verificação de tipos aprovada;
 - lint aprovado sem avisos;
 - build de produção concluído;

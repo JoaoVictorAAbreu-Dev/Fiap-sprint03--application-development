@@ -36,8 +36,34 @@ export const weatherService = {
   },
 
   async getCurrentWeatherByLocalities(localities: Locality[]): Promise<WeatherSnapshot[]> {
-    // Executa em paralelo para evitar custo linear de chamadas sequenciais.
-    const snapshots = await Promise.all(localities.map((locality) => this.getCurrentWeatherByLocality(locality)));
-    return snapshots;
+    if (localities.length === 0) {
+      return [];
+    }
+
+    try {
+      // A Open-Meteo aceita coordenadas separadas por virgula e devolve uma lista
+      // na mesma ordem, reduzindo dez requisicoes paralelas para uma chamada em lote.
+      const response = await openMeteoClient.get<OpenMeteoForecastDto | OpenMeteoForecastDto[]>('/v1/forecast', {
+        params: {
+          latitude: localities.map((locality) => locality.latitude).join(','),
+          longitude: localities.map((locality) => locality.longitude).join(','),
+          current: CURRENT_FIELDS,
+        },
+      });
+
+      const forecasts = Array.isArray(response.data) ? response.data : [response.data];
+
+      if (forecasts.length !== localities.length) {
+        throw new Error(`Expected ${localities.length} weather results, received ${forecasts.length}`);
+      }
+
+      return forecasts.map((forecast, index) => toWeatherSnapshot(localities[index], forecast.current));
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error('Open-Meteo batch request failed', { cause: error });
+      }
+
+      throw new Error('Unexpected Open-Meteo batch response', { cause: error });
+    }
   },
 };
