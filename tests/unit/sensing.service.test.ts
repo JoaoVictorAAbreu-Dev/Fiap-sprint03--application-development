@@ -33,7 +33,7 @@ describe('sensing.service', () => {
     const result = await sensingService.getMonitoredLocalities({ limit: 10 });
 
     expect(result).toHaveLength(10);
-    expect(result[0]?.name).toBe('Campinas');
-    expect(result[1]?.name).toBe('Sorocaba');
+    expect(result[0]?.name).toBe('Campinas, Sao Paulo, Brasil');
+    expect(result[1]?.name).toBe('Sorocaba, Sao Paulo, Brasil');
   });
 });

@@ -5,6 +5,11 @@ export const appRouter = createBrowserRouter([
   {
     path: '/',
     element: <DashboardLayout />,
+    hydrateFallbackElement: (
+      <main className="min-h-screen bg-slate-50 p-6 text-slate-700" role="status">
+        Carregando dashboard...
+      </main>
+    ),
     children: [
       {
         index: true,

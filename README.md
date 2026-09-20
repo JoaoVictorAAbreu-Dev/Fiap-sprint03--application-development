@@ -1,165 +1,282 @@
-﻿# Sprint02 - Application Development
+# GreenWatch — Sprint 3 de Application Development
 
-## 1. Apresentacao
+### Monitoramento e classificação automática da vegetação em trechos rodoviários
 
-Este projeto implementa uma aplicacao web para monitoramento de localidades, com consolidacao de indicadores meteorologicos, exibicao geoespacial em mapa e classificacao de risco operacional. A solucao foi desenvolvida em TypeScript com React, adotando uma estrutura orientada a camadas para facilitar evolucao, manutencao e testes.
+O **GreenWatch** é uma aplicação web de apoio ao monitoramento ambiental. Nesta Sprint, a solução evolui o trabalho desenvolvido anteriormente e passa a classificar automaticamente a condição da vegetação com base em sua altura, indicando o nível de atenção e a ação operacional recomendada para cada localidade.
 
-## 2. Objetivo
+| Informação acadêmica | Detalhes |
+| --- | --- |
+| Curso | 2º ano de Ciência da Computação |
+| Disciplina | Application Development |
+| Professor | Allan Roberto Molto |
+| Período | 2º semestre — Sprint 3 |
+| Valor da entrega | 10,0 pontos |
 
-Fornecer uma base de monitoramento capaz de:
+## Sumário
 
-- consultar dados de localidades monitoradas;
-- integrar dados climaticos em tempo quase real;
-- calcular score de risco por localidade;
-- apresentar visoes executivas em dashboard e mapa;
-- apoiar tomada de decisao com indicadores sinteticos.
+- [Objetivo da Sprint](#objetivo-da-sprint)
+- [Funcionalidades entregues](#funcionalidades-entregues)
+- [Regras de classificação](#regras-de-classificação)
+- [Fluxo da solução](#fluxo-da-solução)
+- [Atendimento aos critérios de avaliação](#atendimento-aos-critérios-de-avaliação)
+- [Arquitetura e organização](#arquitetura-e-organização)
+- [Tecnologias utilizadas](#tecnologias-utilizadas)
+- [Como executar](#como-executar)
+- [Qualidade e validação](#qualidade-e-validação)
+- [Vídeo Pitch](#vídeo-pitch)
+- [Integrantes](#integrantes)
 
-## 3. Escopo funcional
+## Objetivo da Sprint
 
-O sistema contempla:
+O objetivo da Sprint 3 é acrescentar recursos de **análise e classificação automática das condições da vegetação** monitorada ao longo das rodovias.
 
-- painel com metricas agregadas;
-- mapa com marcadores de risco;
-- pagina de monitoramento meteorologico por localidade;
-- componentes visuais reutilizaveis para score e classificacao de risco.
+A aplicação recebe ou utiliza dados de altura, processa cada ponto conforme faixas de risco previamente definidas e apresenta no dashboard as quatro informações obrigatórias:
 
-## 4. Stack tecnologica
+> **Localização | Altura da vegetação | Classificação | Ação recomendada**
 
-- React 19
-- TypeScript
-- Vite
-- React Router
-- TanStack Query
-- Leaflet + React Leaflet
-- Axios
-- Tailwind CSS
-- Vitest
-- ESLint
+Além da classificação por altura, a aplicação preserva as funcionalidades complementares de mapa, dados climáticos, alertas e indicadores executivos.
 
-## 5. Requisitos de ambiente
+## Funcionalidades entregues
 
-- Node.js 22 ou superior
-- npm 10 ou superior
+- classificação automática da vegetação conforme a altura registrada;
+- array de objetos com faixas, classificações e ações recomendadas;
+- processamento dos pontos monitorados com funções JavaScript/TypeScript e `forEach()`;
+- uso de estruturas condicionais para determinar a situação de cada ponto;
+- criação dinâmica das linhas da tabela por meio de componentes React;
+- apresentação de localização, altura, classificação e ação recomendada;
+- identificação visual por cores para os níveis Normal, Atenção, Risco e Crítico;
+- indicadores resumidos de altura média e quantidade de intervenções necessárias;
+- consulta de até 10 localidades por meio do OpenStreetMap Nominatim;
+- dados climáticos complementares obtidos pela Open-Meteo;
+- funcionamento da classificação mesmo quando a API climática estiver indisponível;
+- fallback local para manter os pontos monitorados quando a consulta de localidades falhar.
 
-## 6. Configuracao e execucao
+## Regras de classificação
 
-1. Instalar dependencias:
+As regras foram definidas pelo grupo de forma coerente com a proposta de monitoramento e estão centralizadas no array `VEGETATION_HEIGHT_BANDS`.
 
-```bash
-npm install
+| Faixa de altura | Classificação | Interpretação | Ação recomendada |
+| --- | --- | --- | --- |
+| De 0 a 30 cm | **Normal** | Vegetação dentro da faixa segura | Manter o monitoramento de rotina |
+| Acima de 30 até 50 cm | **Atenção** | Vegetação próxima do limite operacional | Aumentar a frequência de inspeção do ponto |
+| Acima de 50 até 80 cm | **Risco** | Vegetação exige planejamento de manutenção | Programar o serviço de roçada |
+| Acima de 80 cm | **Crítico** | Vegetação exige resposta prioritária | Realizar intervenção imediata e sinalizar a área |
+
+Os limites de `30`, `50` e `80` centímetros pertencem, respectivamente, às classificações **Normal**, **Atenção** e **Risco**. A função de classificação rejeita alturas negativas, infinitas ou que não sejam numéricas.
+
+### Identificação visual
+
+| Classificação | Cor utilizada |
+| --- | --- |
+| Normal | Verde |
+| Atenção | Amarelo |
+| Risco | Laranja |
+| Crítico | Vermelho |
+
+> [!IMPORTANT]
+> As alturas presentes no repositório formam uma massa de dados demonstrativa e determinística. Elas permitem validar toda a lógica da Sprint 3, mas não representam medições reais de campo. A estrutura foi preparada para que esses valores possam ser substituídos futuramente por dados de sensores ou de uma API.
+
+## Fluxo da solução
+
+```mermaid
+flowchart LR
+    A[Localidades monitoradas] --> B[Alturas da vegetação]
+    B --> C[Processamento com forEach]
+    C --> D{Classificação por altura}
+    D --> E[Normal]
+    D --> F[Atenção]
+    D --> G[Risco]
+    D --> H[Crítico]
+    E --> I[Dashboard dinâmico]
+    F --> I
+    G --> I
+    H --> I
+    I --> J[Ação recomendada por ponto]
 ```
 
-2. Configurar variaveis de ambiente:
+O processamento principal segue estas etapas:
+
+1. `sensingService` obtém as localidades monitoradas ou utiliza a lista de fallback.
+2. `buildVegetationMonitoringPoints()` percorre as localidades com `forEach()` e associa uma altura a cada ponto.
+3. `classifyVegetationHeight()` utiliza condicionais para selecionar a faixa correspondente.
+4. Cada resultado recebe uma classificação e uma ação recomendada.
+5. `VegetationMonitoringTable` cria dinamicamente as linhas da tabela no dashboard.
+6. `VegetationClassificationBadge` aplica a classe visual correspondente ao nível encontrado.
+
+## Atendimento aos critérios de avaliação
+
+| Critério | Peso | Evidência implementada | Situação |
+| --- | ---: | --- | --- |
+| Implementação da lógica de classificação da vegetação | 3,0 | Array de faixas, condicionais, validação de entrada e testes dos limites | Concluído |
+| JavaScript para manipulação dos dados e atualização dinâmica do dashboard | 2,5 | TypeScript compilado para JavaScript, `forEach()` e renderização dinâmica com React | Concluído |
+| Localidades, altura, classificação e ação recomendada | 2,5 | Tabela completa no dashboard e na página de sensoriamento, com cores por nível | Concluído |
+| Vídeo Pitch de 1 minuto no YouTube | 2,0 | Seção preparada para receber o link após a gravação | Em produção |
+| **Total** | **10,0** |  |  |
+
+### Evidências no código
+
+| Arquivo | Responsabilidade |
+| --- | --- |
+| `src/shared/constants/vegetation-height-bands.ts` | Faixas de altura, classificações, ações e alturas demonstrativas |
+| `src/shared/utils/vegetation-classification.util.ts` | Validação, condicionais, `forEach()` e montagem dos pontos classificados |
+| `src/domain/entities/vegetation-monitoring.entity.ts` | Tipos do domínio de monitoramento da vegetação |
+| `src/presentation/components/vegetation/vegetation-monitoring-table.tsx` | Tabela dinâmica com as quatro informações obrigatórias |
+| `src/presentation/components/shared/vegetation-classification-badge.tsx` | Cores e estilos visuais das classificações |
+| `src/presentation/pages/dashboard.page.tsx` | Indicadores e apresentação da classificação no dashboard |
+| `tests/unit/vegetation-classification.util.test.ts` | Testes das faixas, entradas inválidas e ações recomendadas |
+
+## Arquitetura e organização
+
+O projeto utiliza uma organização em camadas para separar domínio, integrações, regras de processamento e interface.
+
+```text
+src/
+├── app/                     # Roteamento e providers da aplicação
+├── application/             # DTOs e mapeadores de dados externos
+├── domain/                  # Entidades e tipos do domínio
+├── infrastructure/          # Clientes HTTP e serviços de integração
+├── presentation/
+│   ├── components/          # Tabelas, badges, mapa e componentes compartilhados
+│   ├── hooks/               # Consultas e gerenciamento de estado assíncrono
+│   ├── layouts/             # Estrutura visual compartilhada
+│   └── pages/               # Dashboard, mapa, sensoriamento e alertas
+├── shared/
+│   ├── constants/           # Faixas, localidades de fallback e chaves de consulta
+│   └── utils/               # Classificação e cálculos auxiliares
+└── styles/                  # Estilos globais
+
+tests/
+└── unit/                    # Testes automatizados
+```
+
+### Integrações externas
+
+- **OpenStreetMap Nominatim:** consulta das localidades monitoradas;
+- **Open-Meteo:** condições climáticas atuais por coordenada.
+
+As informações climáticas são complementares. Se a Open-Meteo estiver lenta ou indisponível, o dashboard informa a falha e mantém a classificação da vegetação acessível.
+
+## Tecnologias utilizadas
+
+- React 19;
+- TypeScript;
+- Vite 8;
+- React Router;
+- TanStack Query;
+- Tailwind CSS;
+- Axios;
+- Leaflet e React Leaflet;
+- Vitest;
+- ESLint.
+
+O código-fonte utiliza TypeScript, que é compilado para JavaScript pelo Vite. A tipagem explícita protege as faixas, classificações e ações contra combinações inválidas durante o desenvolvimento.
+
+## Como executar
+
+### Pré-requisitos
+
+- Node.js 22.12 ou superior, ou Node.js 20.19+;
+- npm 10 ou superior.
+
+### Instalação
+
+```bash
+git clone https://github.com/JoaoVictorAAbreu-Dev/fiap-application-development-sprint-02.git
+cd fiap-application-development-sprint-02
+git checkout sprint-03
+npm ci
+```
+
+### Configuração
+
+Linux ou macOS:
 
 ```bash
 cp .env.example .env
 ```
 
-3. Executar ambiente de desenvolvimento:
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+### Ambiente de desenvolvimento
 
 ```bash
 npm run dev
 ```
 
-## 7. Scripts disponiveis
+O Vite informará no terminal o endereço local da aplicação, normalmente `http://localhost:5173`.
 
-- `npm run dev`: inicializa o servidor local de desenvolvimento.
-- `npm run lint`: executa analise estatica de codigo com tolerancia zero para warnings.
-- `npm run test`: executa os testes unitarios.
-- `npm run test:watch`: executa testes em modo observacao.
-- `npm run typecheck`: valida tipagem TypeScript sem emitir artefatos.
-- `npm run build`: gera build de producao com validacao de tipos.
-- `npm run preview`: publica localmente o build gerado.
+## Scripts disponíveis
 
-## 8. Arquitetura da solucao
+| Comando | Finalidade |
+| --- | --- |
+| `npm run dev` | Inicia o servidor local de desenvolvimento |
+| `npm run test` | Executa todos os testes unitários uma vez |
+| `npm run test:watch` | Executa os testes em modo de observação |
+| `npm run typecheck` | Verifica os tipos TypeScript sem gerar arquivos |
+| `npm run lint` | Executa a análise estática com tolerância zero para avisos |
+| `npm run build` | Valida os tipos e gera o build de produção |
+| `npm run preview` | Executa localmente o build já gerado |
 
-A organizacao segue principios de separacao de responsabilidades, com camadas explicitas:
+## Qualidade e validação
 
-- `src/domain`: entidades e contratos centrais do dominio.
-- `src/application`: DTOs e mapeadores responsaveis por traducao de dados.
-- `src/infrastructure`: clientes HTTP e servicos de integracao externa.
-- `src/presentation`: paginas, componentes e hooks de interface.
-- `src/shared`: utilitarios, configuracoes e constantes transversais.
+Para validar a entrega completa:
 
-Essa divisao reduz acoplamento entre regras de negocio, mecanismos de integracao e interface.
-
-## 9. Fluxo de dados
-
-1. A camada de apresentacao dispara consultas via hooks de query.
-2. Servicos de infraestrutura consomem APIs externas.
-3. Mapeadores convertem payloads externos para entidades internas.
-4. Utilitarios de risco calculam score e nivel por localidade.
-5. Componentes de UI apresentam indicadores consolidados e pontos criticos.
-
-## 10. Qualidade e validacao
-
-O projeto adota validacoes automatizadas em tres niveis:
-
-- qualidade de codigo: `npm run lint`;
-- confiabilidade funcional: `npm run test`;
-- consistencia de build e tipagem: `npm run build`.
-
-Atualmente, os testes unitarios cobrem logica de risco e mapeamento meteorologico, servindo como base para expansao de cobertura.
-
-## 11. Decisoes tecnicas relevantes
-
-- uso de React Query para gerenciamento de estado assincrono e cache;
-- lazy loading de rotas para reduzir custo de carregamento inicial;
-- modelagem explicita de entidades para melhorar legibilidade e manutencao;
-- uso de TypeScript em toda a base para seguranca de tipos em tempo de desenvolvimento.
-
-## 12. Estrutura de diretorios
-
-```text
-src/
-  app/
-  application/
-  domain/
-  infrastructure/
-  presentation/
-  shared/
-tests/
-  unit/
-  integration/
-  e2e/
+```bash
+npm run test
+npm run typecheck
+npm run lint
+npm run build
+npm audit
 ```
 
-## 13. Evolucao recomendada
+No estado atual da Sprint 3:
 
-Para continuidade do projeto, recomenda-se:
+- **18 testes unitários aprovados** em 5 arquivos;
+- verificação de tipos aprovada;
+- lint aprovado sem avisos;
+- build de produção concluído;
+- auditoria npm sem vulnerabilidades conhecidas;
+- dashboard validado em desktop e dispositivo móvel;
+- estados de sucesso, carregamento e falha da API climática verificados.
 
-- ampliar testes de integracao dos servicos HTTP;
-- incluir testes de interface para paginas criticas;
-- formalizar pipeline CI com lint, testes e build em pull requests.
+## Vídeo Pitch
 
-## 14. Video Pitch
+> [!NOTE]
+> **Status: em gravação.** O vídeo de aproximadamente 1 minuto será publicado no YouTube e o link será inserido aqui antes da entrega final.
 
-Vídeo de apresentação da Sprint 2:
+**Link do vídeo da Sprint 3:** `A inserir após a publicação`
 
-[Assistir ao vídeo pitch](https://youtu.be/o3p0zVOPK0o)
+<!-- Substitua o texto acima pelo link público do vídeo da Sprint 3. -->
 
-## 15. Evidencias visuais (prints)
+<details>
+<summary><strong>Roteiro sugerido para o pitch de 60 segundos</strong></summary>
 
-### Dashboard Executivo
-![Dashboard Executivo](docs/screenshots/dashboard.png)
+- **0–10 s — Contexto:** apresentar o problema do crescimento da vegetação nas rodovias e o objetivo da Sprint 3.
+- **10–22 s — Dados:** mostrar o array de objetos com faixas, classificações e ações recomendadas.
+- **22–35 s — Código:** explicar rapidamente a função com condicionais e o processamento com `forEach()`.
+- **35–52 s — Aplicação:** demonstrar a tabela do dashboard, as quatro informações obrigatórias e as cores dos níveis.
+- **52–60 s — Encerramento:** destacar como a solução ajuda a priorizar acompanhamento e intervenções.
 
-### Mapa de Monitoramento
-![Mapa de Monitoramento](docs/screenshots/mapa.png)
+</details>
 
-### Sensoriamento - Localidades
-![Sensoriamento - Localidades](docs/screenshots/sensoriamento-localidades.png)
+### Checklist antes da entrega
 
-### Sensoriamento - Condicoes Climaticas
-![Sensoriamento - Condicoes Climaticas](docs/screenshots/sensoriamento-clima.png)
+- [ ] Gravar um vídeo de aproximadamente 1 minuto;
+- [ ] demonstrar o funcionamento da solução;
+- [ ] explicar o array de faixas, as condicionais e o `forEach()`;
+- [ ] publicar o vídeo no YouTube com acesso público ou não listado;
+- [ ] substituir o marcador acima pelo link do vídeo;
+- [ ] testar o link em uma janela anônima.
 
-### Alertas Operacionais
-![Alertas Operacionais](docs/screenshots/alertas.png)
+## Integrantes
 
-## 16. Garantia de 10 localidades monitoradas
-
-Para manter consistencia da apresentacao de sensoriamento:
-
-- o sistema consulta o Nominatim com `limit=10`;
-- se a API retornar menos pontos (ou falhar), um fallback fixo de 10 regioes reais e aplicado;
-- o clima e consultado por coordenada para todos os pontos finais.
-
+| Integrante | RM |
+| --- | ---: |
+| João Victor Alves de Abreu | 564946 |
+| Luiz Henrique Barbosa Dias | 562399 |
+| Nathan Lopes Silva | 563507 |
+| Rodrigo Kenshin Viana Matayoshi | 564026 |
