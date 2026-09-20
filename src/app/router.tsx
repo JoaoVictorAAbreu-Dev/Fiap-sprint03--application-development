@@ -1,7 +1,7 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createHashRouter } from 'react-router-dom';
 import { DashboardLayout } from '@/presentation/layouts/dashboard.layout';
 
-export const appRouter = createBrowserRouter(
+export const appRouter = createHashRouter(
   [
     {
       path: '/',
@@ -43,5 +43,4 @@ export const appRouter = createBrowserRouter(
       ],
     },
   ],
-  { basename: import.meta.env.BASE_URL },
 );
