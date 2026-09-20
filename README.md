@@ -1,5 +1,13 @@
 # GreenWatch — Sprint 3 de Application Development
 
+## Integrantes
+
+| Integrante | RM |
+| --- | ---: |
+| João Victor Alves de Abreu | 564946 |
+| Luiz Henrique Barbosa Dias | 562399 |
+| Rodrigo Kenshin Viana Matayoshi | 564026 |
+
 ### Monitoramento e classificação automática da vegetação em trechos rodoviários
 
 O **GreenWatch** é uma aplicação web de apoio ao monitoramento ambiental. Nesta Sprint, a solução evolui o trabalho desenvolvido anteriormente e passa a classificar automaticamente a condição da vegetação com base em sua altura, indicando o nível de atenção e a ação operacional recomendada para cada localidade.
@@ -252,38 +260,7 @@ No estado atual da Sprint 3:
 
 ## Vídeo Pitch
 
-> [!NOTE]
-> **Status: em gravação.** O vídeo de aproximadamente 1 minuto será publicado no YouTube e o link será inserido aqui antes da entrega final.
-
 **Link do vídeo da Sprint 3:** `A inserir após a publicação`
 
 <!-- Substitua o texto acima pelo link público do vídeo da Sprint 3. -->
 
-<details>
-<summary><strong>Roteiro sugerido para o pitch de 60 segundos</strong></summary>
-
-- **0–10 s — Contexto:** apresentar o problema do crescimento da vegetação nas rodovias e o objetivo da Sprint 3.
-- **10–22 s — Dados:** mostrar o array de objetos com faixas, classificações e ações recomendadas.
-- **22–35 s — Código:** explicar rapidamente a função com condicionais e o processamento com `forEach()`.
-- **35–52 s — Aplicação:** demonstrar a tabela do dashboard, as quatro informações obrigatórias e as cores dos níveis.
-- **52–60 s — Encerramento:** destacar como a solução ajuda a priorizar acompanhamento e intervenções.
-
-</details>
-
-### Checklist antes da entrega
-
-- [ ] Gravar um vídeo de aproximadamente 1 minuto;
-- [ ] demonstrar o funcionamento da solução;
-- [ ] explicar o array de faixas, as condicionais e o `forEach()`;
-- [ ] publicar o vídeo no YouTube com acesso público ou não listado;
-- [ ] substituir o marcador acima pelo link do vídeo;
-- [ ] testar o link em uma janela anônima.
-
-## Integrantes
-
-| Integrante | RM |
-| --- | ---: |
-| João Victor Alves de Abreu | 564946 |
-| Luiz Henrique Barbosa Dias | 562399 |
-| Nathan Lopes Silva | 563507 |
-| Rodrigo Kenshin Viana Matayoshi | 564026 |
