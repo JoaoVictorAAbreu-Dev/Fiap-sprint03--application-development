@@ -2,10 +2,14 @@ import type { NominatimLocalityDto } from '@/application/dto/nominatim.dto';
 import type { Locality } from '@/domain/entities/locality.entity';
 
 export const toLocality = (item: NominatimLocalityDto): Locality => {
-  const primaryName = item.display_name.split(',')[0]?.trim();
+  const locationParts = item.display_name
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const descriptiveName = locationParts.slice(0, 3).join(', ');
 
   return {
-    name: primaryName || item.display_name,
+    name: descriptiveName || item.display_name,
     latitude: Number(item.lat),
     longitude: Number(item.lon),
   };

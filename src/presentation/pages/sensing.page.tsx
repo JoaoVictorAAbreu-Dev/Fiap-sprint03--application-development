@@ -1,6 +1,8 @@
+import { VegetationMonitoringTable } from '@/presentation/components/vegetation/vegetation-monitoring-table';
 import { useCurrentWeatherByLocalitiesQuery } from '@/presentation/hooks/queries/use-current-weather-by-localities.query';
 import { useMonitoredLocalitiesQuery } from '@/presentation/hooks/queries/use-monitored-localities.query';
 import { buildFictitiousSensingSnapshot } from '@/shared/utils/sensing-simulation.util';
+import { buildVegetationMonitoringPoints } from '@/shared/utils/vegetation-classification.util';
 
 export const SensingPage = () => {
   const { data, isLoading, isError, error, refetch, isFetching } = useMonitoredLocalitiesQuery({
@@ -13,6 +15,7 @@ export const SensingPage = () => {
     error: weatherError,
     refetch: refetchWeather,
   } = useCurrentWeatherByLocalitiesQuery(data ?? []);
+  const vegetationPoints = buildVegetationMonitoringPoints(data ?? []);
 
   if (isLoading) {
     return (
@@ -42,18 +45,19 @@ export const SensingPage = () => {
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-slate-900">Sensoriamento</h2>
-        <span className="text-xs text-slate-500">{isFetching ? 'Atualizando...' : 'Atualizado'}</span>
-      </div>
+    <section className="space-y-6">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-slate-900">Sensoriamento</h2>
+          <span className="text-xs text-slate-500">{isFetching ? 'Atualizando...' : 'Atualizado'}</span>
+        </div>
 
-      <p className="mt-2 text-sm text-slate-600">
-        Top 10 localidades obtidas automaticamente via OpenStreetMap Nominatim.
-      </p>
+        <p className="mt-2 text-sm text-slate-600">
+          Top 10 localidades obtidas automaticamente via OpenStreetMap Nominatim.
+        </p>
 
-      <div className="mt-4 overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200">
+        <div className="mt-4 overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
           <thead>
             <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
               <th className="py-2 pr-4">Nome</th>
@@ -70,10 +74,13 @@ export const SensingPage = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
 
-      <div className="mt-8">
+      <VegetationMonitoringTable points={vegetationPoints} />
+
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h3 className="text-base font-semibold text-slate-900">Sensoriamento ficticio por localidade</h3>
         <p className="mt-2 text-sm text-slate-600">
           Indicadores sinteticos de vegetacao, solo, qualidade do ar e foco termico.
@@ -112,7 +119,7 @@ export const SensingPage = () => {
         )}
       </div>
 
-      <div className="mt-8">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h3 className="text-base font-semibold text-slate-900">Condicoes climaticas atuais (Open-Meteo)</h3>
 
         {isWeatherLoading && <p className="mt-2 text-sm text-slate-600">Carregando clima dos pontos...</p>}
