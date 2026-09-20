@@ -260,7 +260,7 @@ No estado atual da Sprint 3:
 
 ## Vídeo Pitch
 
-**Link do vídeo da Sprint 3:** `A inserir após a publicação`
+**Link do vídeo da Sprint 3: https://youtu.be/VlhCzEI9VtM** 
 
 <!-- Substitua o texto acima pelo link público do vídeo da Sprint 3. -->
 
