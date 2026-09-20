@@ -4,6 +4,12 @@
 
 O **GreenWatch** é uma aplicação web de apoio ao monitoramento ambiental. Nesta Sprint, a solução evolui o trabalho desenvolvido anteriormente e passa a classificar automaticamente a condição da vegetação com base em sua altura, indicando o nível de atenção e a ação operacional recomendada para cada localidade.
 
+## Demonstração online
+
+**[Acessar o GreenWatch — Sprint 3](https://joaovictoraabreu-dev.github.io/Fiap-sprint03--application-development/)**
+
+O ambiente publicado utiliza a branch `sprint-03` e pode ser usado para demonstrar o dashboard, o mapa, o sensoriamento e os alertas durante a gravação do vídeo Pitch.
+
 | Informação acadêmica | Detalhes |
 | --- | --- |
 | Curso | 2º ano de Ciência da Computação |
@@ -14,6 +20,7 @@ O **GreenWatch** é uma aplicação web de apoio ao monitoramento ambiental. Nes
 
 ## Sumário
 
+- [Demonstração online](#demonstração-online)
 - [Objetivo da Sprint](#objetivo-da-sprint)
 - [Funcionalidades entregues](#funcionalidades-entregues)
 - [Regras de classificação](#regras-de-classificação)
