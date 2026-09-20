@@ -12,9 +12,23 @@
 
 O **GreenWatch** é uma aplicação web de apoio ao monitoramento ambiental. Nesta Sprint, a solução evolui o trabalho desenvolvido anteriormente e passa a classificar automaticamente a condição da vegetação com base em sua altura, indicando o nível de atenção e a ação operacional recomendada para cada localidade.
 
+## Demonstração online
+
+**[Acessar o GreenWatch — Sprint 3](https://joaovictoraabreu-dev.github.io/Fiap-sprint03--application-development/)**
+
+O ambiente publicado utiliza a branch `sprint-03` e pode ser usado para demonstrar o dashboard, o mapa, o sensoriamento e os alertas durante a gravação do vídeo Pitch.
+
+| Informação acadêmica | Detalhes |
+| --- | --- |
+| Curso | 2º ano de Ciência da Computação |
+| Disciplina | Application Development |
+| Professor | Allan Roberto Molto |
+| Período | 2º semestre — Sprint 3 |
+| Valor da entrega | 10,0 pontos |
 
 ## Sumário
 
+- [Demonstração online](#demonstração-online)
 - [Objetivo da Sprint](#objetivo-da-sprint)
 - [Funcionalidades entregues](#funcionalidades-entregues)
 - [Regras de classificação](#regras-de-classificação)
@@ -236,7 +250,7 @@ npm audit
 
 No estado atual da Sprint 3:
 
-- **18 testes unitários aprovados** em 5 arquivos;
+- **21 testes unitários aprovados** em 6 arquivos;
 - verificação de tipos aprovada;
 - lint aprovado sem avisos;
 - build de produção concluído;
